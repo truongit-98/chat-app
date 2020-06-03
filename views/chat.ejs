@@ -1,0 +1,392 @@
+<html>
+
+<head>
+  <title>Chat App</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" type="text/css"
+    rel="stylesheet">
+  <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+
+  <link rel="stylesheet" type="text/css" href="/stylesheets/main.css">
+  <link rel="stylesheet" href="/stylesheets/style.css">
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+
+  <!------ Include the above in your HEAD tag ---------->
+
+</head>
+
+<body>
+  <div class="container">
+    <h3 class=" text-center">Messaging</h3>
+    <div style="right: 100px; top: 10px; position: absolute; ">
+      <a href="/logout">
+        <i style="font-size: 24;" class="fa fa-sign-out"></i>
+      </a>
+    </div>
+    <div class="messaging">
+      <div class="inbox_msg">
+        <div class="inbox_people">
+          <div class="headind_srch">
+            <div class="recent_heading">
+              <button onclick="disPlayModel()" class="btn btn-primary">Create</button>
+            </div>
+            <div class="srch_bar">
+              <div class="stylish-input-group">
+                <input type="text" class="search-bar" placeholder="Search">
+                <span class="input-group-addon">
+                  <button class="btn-search" pe="button"> <i class="fa fa-search" aria-hidden="true"></i> </button>
+                </span> </div>
+            </div>
+          </div>
+          <div class="inbox_chat">
+            <% if(rooms.length > 0) {%>
+            <div class="chat_list active_chat">
+              <div style="float: right;margin-left: 10px;">
+                <h5 data-id="<%= rooms[0]._id%>"><%= rooms[0].name%></h5>
+              </div>
+              <div class="chat_people">
+                <div class="chat_img"> <img style="border-radius: 50%;"
+                    src="<%=rooms[0].conversations[0]?.member.facebook.profilePic || '/images/user-profile.png'%>"
+                    alt="sunil"> </div>
+                <div class="chat_ib">
+                  <h5>
+                    <%=rooms[0].conversations[0]?.member.local.fullName || rooms[0].conversations[0]?.member.google.displayName || rooms[0].conversations[0]?.member.facebook.displayName%><span
+                      class="chat_date"><%=new Date(rooms[0]?.dateCreated).toLocaleDateString("en-US", {year: 'numeric', month:'short', day:'2-digit'})%></span>
+                  </h5>
+                  <p><%=rooms[0].conversations[0]?.content %><span
+                      class="time_date"><%= rooms[0].conversations[0] ? ( new Date(rooms[0].conversations[0].dateCreated).getHours() + ':' + new Date(rooms[0].conversations[0].dateCreated).getMinutes() + '| Today' ) : ''%>
+                    </span></p>
+                </div>
+              </div>
+            </div>
+            <% for (let i=1; i < rooms.length;i++) {%>
+            <div class="chat_list">
+              <div style="float: right;margin-left: 10px;">
+                <h5 data-id="<%= rooms[i]._id%>"><%= rooms[i]?.name%></h5>
+              </div>
+              <div class="chat_people">
+                <div class="chat_img"> <img style="border-radius: 50%;"
+                    src="<%=rooms[i]?.conversations[0]?.member.facebook?.profilePic || '/images/user-profile.png'%>"
+                    alt="sunil"> </div>
+                <div class="chat_ib">
+                  <h5>
+                    <%=rooms[i]?.conversations[0]?.member.local.fullName || rooms[i]?.conversations[0]?.member.google.displayName || rooms[i]?.conversations[0]?.member.facebook.displayName %><span
+                      class="chat_date"><%=new Date(rooms[i]?.dateCreated).toLocaleDateString("en-US", {year: 'numeric', month:'short', day:'2-digit'})%></span>
+                  </h5>
+                  <p><%=rooms[i]?.conversations[0]?.content%><span class="time_date">
+                      <%=rooms[i].conversations[0] ? ( new Date(rooms[i].conversations[0].dateCreated).getHours() + ':' + new Date(rooms[i].conversations[0].dateCreated).getMinutes() + '| Today' ) : ''%>
+                    </span></p>
+                </div>
+              </div>
+            </div>
+            <% } %>
+            <%}%>
+          </div>
+        </div>
+        <div class="mesgs">
+          <div class="msg_history">
+          </div>
+          <div class="type_msg">
+            <div class="input_msg_write">
+              <input type="text" class="write_msg" placeholder="Type a message" />
+              <button class="msg_send_btn" type="button"><i class="fa fa-paper-plane-o" aria-hidden="true"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="Model"
+    style="display: none; position: fixed;top: 0px;left: 0px;right: 0px;bottom: 0px;background: rgba(0, 0, 0, 0.53);overflow-y: scroll;z-index: 1000;">
+    <div class=""
+      style="position: relative; top: 0px; left: 0px; right: 0px; bottom: 0px; border: none; background: rgb(255, 255, 255); overflow: unset; border-radius: 4px; outline: none; padding: 0px; width: 600px; margin: 0px auto;">
+      <div class="lmVrvP">
+        <div class="kInmCv" style="background: rgb(255, 255, 255); padding: 35px 27px;">
+          <form class="form-create-room">
+            <div class="close-form" style="position: absolute;right: 10;top: 5;font-size: 20px;"><i
+                class="fa fa-window-close"></i></div>
+            <div class="form-group">
+              <label for="">Name</label>
+              <input type="text" class="form-control" name="name" id="" aria-describedby="" placeholder="">
+            </div>
+            <button type="submit" class="btn btn-primary align-center">Submit</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+
+    function disPlayModel() {
+      $('.Model').css('display', 'block');
+    }
+
+    $('input[name="name"]').focus(function (e) {
+      e.preventDefault();
+      $(this).parent().removeClass('alert-validate2');
+    })
+    $('.close-form').on('click', (e) => {
+      e.preventDefault();
+      $('.Model').css('display', 'none');
+    })
+
+
+
+
+    //socket client
+
+    $(function () {
+      const host = '<%= host%>';
+      var socket1 = io(host + '/room', {
+        transports: ['websocket']
+      });
+      var socket2 = io(host + '/chat', {
+        transports: ['websocket']
+      });
+
+
+      // function handleDisplay() {
+      //   let height = 0;
+      //   let countH4 = $('.msg_history').find('h4').length
+      //   height += (countH4-1) * (114) + 64;
+      //   height += ($('.msg_history').children().length - countH4) * (54);
+      //   if (height < 516) { $('.msg_history').addClass('msg-flex'); } else {
+      //     $('.msg_history').removeClass('msg-flex');
+      //   }
+      // } 
+
+      const addChatRoom = (room) => {
+        let roomListDiv = $('.inbox_chat');
+        $.when($('.chat_list').each((i, item) => {
+          $(item).removeClass('active_chat');
+        })).then(() => {
+          let str = `
+              <div class="chat_list active_chat">
+                <div style="float: right;margin-left: 10px;">
+                  <h5 data-id="${room._id}">${room.name}</h5>
+                </div>
+                <div class="chat_people">
+                  <div class="chat_img"> <img style="border-radius: 50%;" src="/images/user-profile.png" alt="sunil">
+                  </div>
+                  <div class="chat_ib">
+                    <h5><span class="chat_date">${new Date(room.dateCreated).toLocaleDateString("en-US", {
+            year: 'numeric',
+            month: 'short', day: '2-digit'
+          })}</span></h5>
+
+                    <p></p>
+                  </div>
+                </div>
+              </div>
+              `;
+          roomListDiv.prepend(str);
+        });
+      }
+
+      const renderConversation = (data, userID) => {
+        let str = '';
+        data.forEach((item, i) => {
+          let date = new Date(item.dateCreated);
+          if (i > 0) {
+            let date2 = new Date(data[i - 1].dateCreated);
+            if (date.getHours() > date2.getHours() + 1) {
+              str += `<h4 class="start_time"><time>${date.getHours()}:${date.getMinutes()}</time></h4>`
+            }
+          } else {
+            str += `<h4 class="start_time" style="margin-top: auto;">
+                <time>${date.getHours()}:${date.getMinutes()}</time></h4>`
+          }
+          if (item.member._id === userID) {
+            str += `<div class="outgoing_msg">
+                <div class="sent_msg">
+                  <p>${item.content}</p>
+                </div>
+              </div>`
+          } else {
+            str += ` <div class="incoming_msg">
+                <div class="incoming_msg_img">
+                  <div style="margin-top: auto;"><img
+                      src="${item.member.facebook.profilePic || '/images/user-profile.png'}" alt="sunil">
+                  </div>
+                </div>
+                <div class="received_msg">
+                  <h5 class="sender-name">${item.member.local.fullName || item.member.facebook.displayName ||
+              item.member.google.displayName}</h5>
+                  <div class="received_withd_msg">
+                    <p>${item.content}</p>
+                  </div>
+                </div>
+              </div>`
+          }
+        });
+        $('.msg_history').html('').append(str);
+        //handleDisplay();
+        $(".msg_history").scrollTop($(".msg_history").height());
+      }
+
+      //event listenning
+
+      socket1.on('errorMessage', (err) => {
+        var thisAlert = $('input[name="name"]').parent();
+        $(thisAlert).attr('data-validate', err);
+        $(thisAlert).addClass('alert-validate2');
+      });
+
+      socket1.on('renderChatRoom', (data) => {
+        let str = '';
+        data.forEach(ele => {
+          str += `
+              <div class="chat_list">
+                <div style="float: right;margin-left: 10px;">
+                  <h5 data-id="${ele._id}">${ele.name}</h5>
+                </div>
+                <div class="chat_people">
+                  <div class="chat_img"> <img style="border-radius: 50%;"
+                      src="${ele?.conversations[0]?.member.facebook?.profilePic || '/images/user-profile.png'}"
+                      alt="sunil"> </div>
+                  <div class="chat_ib">
+                    <h5>
+                      ${ele?.conversations[0]?.member.local.fullName || ele?.conversations[0]?.member.google.displayName
+            || ele?.conversations[0]?.member.facebook.displayName || ''}
+                      <span class="chat_date">${new Date(ele?.dateCreated).toLocaleDateString("en-US", {
+              year: 'numeric',
+              month: 'short', day: '2-digit'
+            })}</span>
+                    </h5>
+                    <p>${ele?.conversations[0]?.content || ''}<span class="time_date">
+                        ${ele.conversations[0] ? (new Date(ele.conversations[0].dateCreated).getHours() + ':' + new
+              Date(ele.conversations[0].dateCreated).getMinutes() + '| Today') : ''}
+                      </span></p>
+                  </div>
+                </div>
+              </div>`;
+        });
+        $('.inbox_chat').html('').append(str);
+        clearTimeout();
+      });
+
+      socket1.on('addChatRoom', (room) => {
+        $('input[name="name"]').val('');
+        $('.Model').css('display', 'none');
+        addChatRoom(room);
+      });
+
+      socket2.on('renderDataMess', (data, userId) => {
+        renderConversation(data, userId)
+      })
+
+      socket2.on('appendMessage', (mess, date) => {
+        let str = '';
+        if (date) {
+          const _date = new Date(date);
+          str += `
+              <h4 class="start_time"><time>${_date.getHours()}:${_date.getMinutes()}</time></h4>
+              `
+        }
+        str += ` <div class="outgoing_msg">
+                <div class="sent_msg">
+                  <p>${mess}</p>
+                </div>
+              </div>`;
+        $('.msg_history').append(str);
+        $(".msg_history").scrollTop($(".msg_history").height());
+       // handleDisplay();
+
+      })
+      socket2.on('inMessage', (data) => {
+        let str = ''
+        if (data.date) {
+          const _date = new Date(data.date);
+          str += `
+              <h4 class="start_time"><time>${_date.getHours()}:${_date.getMinutes()}</time></h4>
+              `
+        }
+        str += `<div class="incoming_msg">
+                <div class="incoming_msg_img">
+                  <div style="margin-top: auto;"><img
+                      src="${data.user.facebook.profilePic || '/images/user-profile.png'}" alt="sunil">
+                  </div>
+                </div>
+                <div class="received_msg">
+                  <h5 class="sender-name">${data.user.local.fullName || data.user.facebook.displayName
+          || data.user.google.displayName}</h5>
+                  <div class="received_withd_msg">
+                    <p>${data.mess}</p>
+                  </div>
+                </div>
+              </div>`
+        $('.msg_history').append(str);
+
+        $(".msg_history").scrollTop($(".msg_history").height());
+      })
+
+
+      //call event
+      var room = '';
+      $(document).ready(function () {
+        room = $($('.active_chat').children()[0].children).data('id');
+        if (room) {
+          socket2.emit('join', room);
+        }
+      })
+
+      var timeOut;
+      document.querySelector('.search-bar').addEventListener('input', function (e) {
+        e.preventDefault();
+        const name = this.value;
+        if (timeOut) {
+          clearTimeout(timeOut);
+        }
+        timeOut = setTimeout(() => {
+          socket1.emit('searchRoom', name);
+        }, 1000);
+      })
+      $('.form-create-room').on('submit', (e) => {
+        e.preventDefault();
+        let name = '';
+        name = $('input[name="name"]').val().trim();
+        socket1.emit('createNewChatRoom', name);
+      })
+
+
+      $('.inbox_chat').on('click', 'div.chat_list', function () {
+        const chatItem = $(this);
+        room = $(chatItem.children()[0].children).data('id');
+        $.when($('.chat_list').each(function (i, val) {
+          $(val).removeClass('active_chat');
+        })).then(function () {
+          chatItem.addClass('active_chat');
+          socket2.emit('join', room);
+        });
+        //window.history.pushState("", "", `/${room}`);
+
+      });
+
+      $(document).on('keyup', (e) => {
+        e.preventDefault();
+        if (e.which === 13 && $('.write_msg').val().trim() !== '') {
+          socket2.emit('newMessage', {
+            mess: $('.write_msg').val().trim(),
+            roomId: room
+          });
+          $('.write_msg').val('');
+        }
+      });
+      $('.msg_send_btn').on('click', (e) => {
+        e.preventDefault();
+        if ($('.write_msg').val().trim() !== '') {
+          socket2.emit('newMessage', {
+            mess: $('.write_msg').val().trim(),
+            roomId: room
+          });
+          $('.write_msg').val('');
+        }
+      })
+
+    });
+
+  </script>
+</body>
+
+</html>

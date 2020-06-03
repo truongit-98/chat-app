@@ -1,0 +1,33 @@
+{
+  "name": "chat-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "exports": "./main.js",
+  "scripts": {
+    "start": " node ./bin/www",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "truong_mta",
+  "license": "MIT",
+  "dependencies": {
+    "bcrypt": "^4.0.1",
+    "connect-flash": "^0.1.1",
+    "connect-mongo": "^3.2.0",
+    "ejs": "^3.0.2",
+    "express": "^4.17.1",
+    "express-session": "^1.17.1",
+    "http-errors": "^1.7.3",
+    "mongodb": "^3.5.7",
+    "mongoose": "^5.9.13",
+    "morgan": "^1.10.0",
+    "passport": "^0.4.1",
+    "passport-facebook": "^3.0.0",
+    "passport-google-oauth20": "^2.0.0",
+    "passport-local": "^1.0.0",
+    "redis": "^3.0.2",
+    "socket.io": "^2.3.0",
+    "socket.io-redis": "^5.2.0"
+  },
+  "type": "module"
+}
